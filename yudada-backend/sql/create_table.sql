@@ -27,6 +27,8 @@ create table if not exists user
 ) comment '用户' collate = utf8mb4_unicode_ci;
 
 -- 应用表
+-- 审核字段四件套：reviewStaus,reviewMessage,reviewId,reviewTime
+--应用名称appName字段最容易被用户当作搜索条件：加索引
 create table if not exists app
 (
     id              bigint auto_increment comment 'id' primary key,
@@ -47,6 +49,8 @@ create table if not exists app
 ) comment '应用' collate = utf8mb4_unicode_ci;
 
 -- 题目表
+-- 每一个题目是json对象options是题目选项【result,socre,value,key】
+-- 测评类用result保存答案属性，的分类用score设置答案分数,value选项内容，key选项（abcd）
 create table if not exists question
 (
     id              bigint auto_increment comment 'id' primary key,
@@ -60,6 +64,8 @@ create table if not exists question
 ) comment '题目' collate = utf8mb4_unicode_ci;
 
 -- 评分结果表
+--测评类看resultProp，得分类看resultScoreRange。老四件套【userId,createTime,updateTime,isDelete】
+-- 根据应用id获取评分结果，所以给应用id加索引
 create table if not exists scoring_result
 (
     id               bigint auto_increment comment 'id' primary key,
@@ -98,13 +104,14 @@ create table if not exists user_answer
 ) comment '用户答题记录' collate = utf8mb4_unicode_ci;
 
 -- 用户答题记录表（分表 0）
+--冗余设计：
 create table if not exists user_answer_0
 (
     id              bigint auto_increment primary key,
     appId           bigint                             not null comment '应用 id',
     appType         tinyint  default 0                 not null comment '应用类型（0-得分类，1-角色测评类）',
     scoringStrategy tinyint  default 0                 not null comment '评分策略（0-自定义，1-AI）',
-    choices         text                               null comment '用户答案（JSON 数组）',
+    choices         text                               null comment '用户答案（JSON 数组存储多条答案）',
     resultId        bigint                             null comment '评分结果 id',
     resultName      varchar(128)                       null comment '结果名称，如物流师',
     resultDesc      text                               null comment '结果描述',
@@ -119,6 +126,11 @@ create table if not exists user_answer_0
 ) comment '用户答题记录分表 0' collate = utf8mb4_unicode_ci;
 
 -- 用户答题记录表（分表 1）
+-- resultId不一定存在[有两种评分策略：1自定义[从评分结果表中根据规则算最好的结果] 2AI[直接把ai的结论填充到答题记录表]]
+--为什么允许resultId为空：AI 分析策略不会从结果表中选取结果，没有 resultld
+-- 为什么要有冗余字段？因为回答记录一旦设置，几乎不会更改，便于查询，节约开发成本
+-- 有可能通过异步的方式/题目答案没提交【只回答一半】，先临时保存结果
+--choices 是JSON 结构，题目选项的 key 数组：["A","B","c"]只存储选项的优点是，可以节约存储空间；但缺点是应用的题目如果发生修改，就对应不上了。
 create table if not exists user_answer_1
 (
     id              bigint auto_increment primary key,
