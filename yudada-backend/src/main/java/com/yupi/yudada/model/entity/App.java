@@ -14,7 +14,7 @@ import lombok.Data;
 @Data
 public class App implements Serializable {
     /**
-     * id
+     * id；使用雪花算法ASSIGN_ID防止被爬虫
      */
     @TableId(type = IdType.ASSIGN_ID)
     private Long id;
@@ -80,7 +80,7 @@ public class App implements Serializable {
     private Date updateTime;
 
     /**
-     * 是否删除
+     * 是否删除：0不删，1逻辑删除【需要打tableLogic逻辑删除注解】
      */
     @TableLogic
     private Integer isDelete;
