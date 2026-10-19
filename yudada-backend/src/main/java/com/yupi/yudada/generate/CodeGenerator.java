@@ -21,11 +21,11 @@ import java.io.Writer;
 public class CodeGenerator {
 
     /**
-     * 用法：修改生成参数和生成路径，注释掉不需要的生成逻辑，然后运行即可
-     *
-     * @param args
-     * @throws TemplateException
-     * @throws IOException
+     * 用法：修改生成参数和生成路径，注释掉不需要的生成逻辑，然后运行即可,然后移动整合
+     * 每写一组dataName，dataKey，upperDatakey执行一次
+     * dataName="题目"/"应用"/“评分结果”/"用户答案"
+     * dataKey="question"/“app”/”scoringResult“/“userAnswer”
+     * upperDataKey = "Question"/“App”/"ScoringResult"/“UserAnswer”
      */
     public static void main(String[] args) throws TemplateException, IOException {
         // 指定生成参数
