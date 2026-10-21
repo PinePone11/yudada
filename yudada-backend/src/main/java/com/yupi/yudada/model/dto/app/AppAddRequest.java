@@ -11,6 +11,8 @@ import java.io.Serializable;
  * @from <a href="https://www.code-nav.cn">编程导航学习圈</a>
  */
 @Data
+    //xxRequest对应前端增删改查接口， AppAddRequest只写必写参数
+    //app实体类存在数据库中，方便扩展给每一个接口写一个请求类接收前端参数
 public class AppAddRequest implements Serializable {
 
     /**
